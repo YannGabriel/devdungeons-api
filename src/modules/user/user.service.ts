@@ -1,10 +1,12 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, ConflictException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { UserEntity } from "./entity/user.entity";
 import { CreateUserDTO } from "./dtos/create-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UpdateUserDto } from "./dtos/update-user.dto";
+import * as bcrypt from "bcrypt";
 
+const BCRYPT_ROUNDS = 10;
 
 @Injectable()
 export class UserService {
@@ -12,56 +14,70 @@ export class UserService {
 
     constructor(
         @InjectRepository(UserEntity)
-        private readonly userRepository: Repository<UserEntity>
-    ) { }
+        private readonly userRepository: Repository<UserEntity>,
+    ) {}
 
     async findUserById(id: string): Promise<UserEntity> {
-        const user = await this.userRepository.findOne({ where: { id } })
+        const user = await this.userRepository.findOne({ where: { id } });
         if (!user) throw new NotFoundException(`Usuário ${id} não encontrado`);
-        return user
+        return user;
     }
 
-    async createUser(userData: CreateUserDTO) {
-        const user = {
+    async findByEmail(email: string): Promise<UserEntity | null> {
+        return this.userRepository.findOne({ where: { email } });
+    }
+
+    async createUser(userData: CreateUserDTO): Promise<UserEntity> {
+        const existing = await this.findByEmail(userData.email);
+        if (existing) throw new ConflictException("E-mail já cadastrado");
+
+        const hashedPassword = await bcrypt.hash(userData.password, BCRYPT_ROUNDS);
+
+        const user = this.userRepository.create({
             username: userData.username,
-            password: userData.password,
             email: userData.email,
+            password: hashedPassword,
             user_level: 0,
-            user_experience: 0
+            user_experience: 0,
+        });
+
+        const saved = await this.userRepository.save(user);
+        this.logger.log(`Usuário criado: ${saved.id}`);
+        return saved;
+    }
+
+    async updateUser(id: string, updateUserData: UpdateUserDto): Promise<UserEntity> {
+        const user = await this.findUserById(id);
+
+        if (updateUserData.email && updateUserData.email !== user.email) {
+            const existing = await this.findByEmail(updateUserData.email);
+            if (existing) throw new ConflictException("E-mail já cadastrado");
         }
 
-        const userStatement = await this.userRepository.create(user)
-        const savedUser = await this.userRepository.save(userStatement)
+        if (updateUserData.password) {
+            updateUserData.password = await bcrypt.hash(updateUserData.password, BCRYPT_ROUNDS);
+        }
 
-        this.logger.log(`Usuário criado: ${savedUser.id}`)
-        return savedUser
+        const updated = await this.userRepository.preload({ id, ...updateUserData });
+        const savedUser = await this.userRepository.save(updated!);
+        this.logger.log(`Usuário ${id} atualizado`);
+        return savedUser;
     }
 
-    async updateUser(id: string, updateUserData: UpdateUserDto) {
-        const user = await this.userRepository.preload({ id, ...updateUserData })
-        if (!user) throw new NotFoundException(`Usuário ${id} não encontrado`);
-
-        const updatedUser = await this.userRepository.save(user);
-        this.logger.log(`Usuário ${id} atualizado: ${JSON.stringify(updateUserData)}`)
-        return updatedUser
-    }
-
-    async updateUserExperience(id: string, new_user_experience_upgrade: number) {
-        const user = await this.findUserById(id)
-        const newExperience = user.user_experience + new_user_experience_upgrade
+    async updateUserExperience(id: string, xpToAdd: number): Promise<{ message: string }> {
+        const user = await this.findUserById(id);
+        const newExperience = user.user_experience + xpToAdd;
 
         if (newExperience >= 1000) {
-            const newLevel = user.user_level + 1
-            const newUserExperience = newExperience - 1000
-
-            await this.userRepository.update({ id }, { user_experience: newUserExperience, user_level: newLevel })
-
-            this.logger.log(`Usuário ${id} subiu para o nível ${newLevel} com ${newUserExperience} XP`)
-            return { message: `Usuário ${id} subiu para o nível ${newLevel}` }
+            const newLevel = user.user_level + 1;
+            const remainingXp = newExperience - 1000;
+            await this.userRepository.update({ id }, { user_experience: remainingXp, user_level: newLevel });
+            this.logger.log(`Usuário ${id} subiu para o nível ${newLevel} com ${remainingXp} XP`);
+            return { message: `Parabéns! Você subiu para o nível ${newLevel}` };
         }
 
-        await this.userRepository.update({ id }, { user_experience: newExperience })
-        this.logger.log(`Usuário ${id} XP atualizado: ${user.user_experience} -> ${newExperience}`)
-        return { message: `XP atualizado para ${newExperience}` }
+        await this.userRepository.update({ id }, { user_experience: newExperience });
+        this.logger.log(`Usuário ${id} XP atualizado: ${user.user_experience} -> ${newExperience}`);
+        return { message: `XP atualizado para ${newExperience}` };
     }
 }

@@ -115,11 +115,6 @@ export class QuestionService {
         this.logger.log(`Questão ${id} removida`);
     }
 
-    /**
-     * Verifica se a alternativa enviada pelo usuário é a resposta correta da questão.
-     * Retorna o XP da questão (definido pelo nível) e, se acertar, o XP ganho.
-     * Se `userId` for informado e a resposta estiver correta, credita o XP ao usuário.
-     */
     async checkAnswer(questionId: string, alternativeId: string, userId?: string) {
         const question = await this.findById(questionId);
 
@@ -172,9 +167,7 @@ export class QuestionService {
             );
         }
         if (data.correta && question.alternatives.some((alt) => alt.correta)) {
-            throw new BadRequestException(
-                "A questão já possui uma alternativa correta",
-            );
+            throw new BadRequestException("A questão já possui uma alternativa correta");
         }
 
         const alternative = this.alternativeRepository.create({
@@ -202,7 +195,6 @@ export class QuestionService {
 
         if (data.correta !== undefined) {
             if (data.correta) {
-                // Garante que apenas esta alternativa fique como correta.
                 await this.alternativeRepository.update(
                     { question_id: alternative.question_id },
                     { correta: false },
@@ -227,9 +219,11 @@ export class QuestionService {
         const count = await this.alternativeRepository.count({
             where: { question_id: alternative.question_id },
         });
+
+        // Correção: impede remoção somente se a questão ficaria com menos de 5 alternativas
         if (count <= ALTERNATIVES_PER_QUESTION) {
             throw new BadRequestException(
-                `Não é possível remover: a questão deve manter exatamente ${ALTERNATIVES_PER_QUESTION} alternativas`,
+                `Não é possível remover: adicione uma alternativa substituta antes de remover esta`,
             );
         }
 
@@ -237,7 +231,7 @@ export class QuestionService {
         this.logger.log(`Alternativa ${alternativeId} removida`);
     }
 
-    // ----- Validações de regra de negócio -----
+    // ----- Validações internas -----
 
     private validateAlternatives(alternatives: CreateAlternativeInputDTO[]): void {
         if (alternatives.length !== ALTERNATIVES_PER_QUESTION) {
@@ -245,7 +239,6 @@ export class QuestionService {
                 `Cada questão deve possuir exatamente ${ALTERNATIVES_PER_QUESTION} alternativas`,
             );
         }
-
         const correctCount = alternatives.filter((alt) => alt.correta).length;
         if (correctCount !== 1) {
             throw new BadRequestException(
@@ -255,18 +248,12 @@ export class QuestionService {
     }
 
     private async ensureLanguageExists(languageId: string): Promise<void> {
-        const exists = await this.languageRepository.exists({
-            where: { id: languageId },
-        });
-        if (!exists) {
-            throw new NotFoundException(`Linguagem ${languageId} não encontrada`);
-        }
+        const exists = await this.languageRepository.exists({ where: { id: languageId } });
+        if (!exists) throw new NotFoundException(`Linguagem ${languageId} não encontrada`);
     }
 
     private async ensureLevelExists(levelId: string): Promise<void> {
         const exists = await this.levelRepository.exists({ where: { id: levelId } });
-        if (!exists) {
-            throw new NotFoundException(`Nível ${levelId} não encontrado`);
-        }
+        if (!exists) throw new NotFoundException(`Nível ${levelId} não encontrado`);
     }
 }

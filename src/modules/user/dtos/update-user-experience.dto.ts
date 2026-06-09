@@ -1,11 +1,15 @@
-import { IsNotEmpty } from "class-validator"
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber, IsUUID, Min } from "class-validator";
 
-
-export class UpdateUserExperienceDto{
-
+export class UpdateUserExperienceDto {
+    @ApiProperty({ example: "uuid" })
     @IsNotEmpty()
-    id: string
+    @IsUUID()
+    id: string;
 
+    @ApiProperty({ example: 50 })
     @IsNotEmpty()
-    user_experiece: number
+    @IsNumber()
+    @Min(0)
+    user_experience: number;
 }
