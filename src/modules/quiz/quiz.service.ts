@@ -6,7 +6,7 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, Repository } from "typeorm";
+import { In, IsNull, Repository } from "typeorm";
 import { QuizSessionEntity } from "./entity/quiz-session.entity";
 import { QuizSessionQuestionEntity } from "./entity/quiz-session-question.entity";
 import { QuizSessionStatus } from "./enums/quiz-session-status.enum";
@@ -64,21 +64,29 @@ export class QuizService {
             return this.formatSessionResponse(existingSession);
         }
 
-        // Seleciona questões aleatórias
-        const qb = this.questionRepo
+        // Seleciona IDs aleatórios sem joins para evitar conflito DISTINCT + RANDOM() no PostgreSQL
+        const idQb = this.questionRepo
             .createQueryBuilder("q")
-            .leftJoinAndSelect("q.alternatives", "alt")
-            .leftJoinAndSelect("q.level", "level")
+            .select("q.id", "id")
             .where("q.language_id = :languageId", { languageId: dto.language_id });
 
         if (dto.level_id) {
-            qb.andWhere("q.level_id = :levelId", { levelId: dto.level_id });
+            idQb.andWhere("q.level_id = :levelId", { levelId: dto.level_id });
         }
 
-        const questions = await qb
+        const idRows = await idQb
             .orderBy("RANDOM()")
-            .take(QUESTIONS_PER_SESSION)
-            .getMany();
+            .limit(QUESTIONS_PER_SESSION)
+            .getRawMany<{ id: string }>();
+
+        const selectedIds = idRows.map((r) => r.id);
+
+        const questions = selectedIds.length > 0
+            ? await this.questionRepo.find({
+                where: { id: In(selectedIds) },
+                relations: { alternatives: true, level: true },
+            })
+            : [];
 
         if (questions.length < MIN_QUESTIONS_REQUIRED) {
             throw new BadRequestException(

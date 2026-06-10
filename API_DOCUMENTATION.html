@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevDungeons API — Documentação de Uso</title>
+<style>
+  :root {
+    --get:    #16a34a;
+    --post:   #2563eb;
+    --patch:  #d97706;
+    --delete: #dc2626;
+    --bg:     #f8fafc;
+    --card:   #ffffff;
+    --border: #e2e8f0;
+    --text:   #1e293b;
+    --muted:  #64748b;
+    --code-bg:#1e293b;
+    --accent: #6366f1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    color: white;
+    padding: 80px 60px;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cover-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #a5b4fc;
+    margin-bottom: 12px;
+  }
+  .cover h1 { font-size: 38px; font-weight: 700; margin-bottom: 10px; }
+  .cover p  { font-size: 16px; color: #c7d2fe; max-width: 520px; }
+  .cover-meta {
+    margin-top: 24px;
+    display: flex;
+    gap: 24px;
+  }
+  .cover-meta span {
+    font-size: 12px;
+    color: #a5b4fc;
+    background: rgba(255,255,255,.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 32px; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+  .toc h2 { font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--accent); }
+  .toc ol { padding-left: 20px; }
+  .toc li { padding: 3px 0; }
+  .toc a  { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  /* ── Section headers ── */
+  h2.section {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 48px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    color: var(--text);
+  }
+  h2.section::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 22px;
+    background: var(--accent);
+    border-radius: 3px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  /* ── Endpoint card ── */
+  .endpoint {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #f1f5f9;
+    border-bottom: 1px solid var(--border);
+  }
+  .method {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    color: white;
+    min-width: 62px;
+    text-align: center;
+  }
+  .method.GET    { background: var(--get); }
+  .method.POST   { background: var(--post); }
+  .method.PATCH  { background: var(--patch); }
+  .method.DELETE { background: var(--delete); }
+
+  .endpoint-url {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .endpoint-tag {
+    margin-left: auto;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+  }
+  .tag-public   { background: #dcfce7; color: #166534; }
+  .tag-protected{ background: #fef9c3; color: #854d0e; }
+
+  .endpoint-body { padding: 20px; }
+  .endpoint-desc {
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  /* ── Sub-sections inside endpoint ── */
+  .sub-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 14px 0 6px;
+  }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--code-bg);
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  pre .key   { color: #93c5fd; }
+  pre .str   { color: #86efac; }
+  pre .num   { color: #fca5a5; }
+  pre .null  { color: #fb923c; }
+  pre .bool  { color: #c4b5fd; }
+  pre .url   { color: #fde68a; }
+  pre .method-color { color: #6ee7b7; font-weight: bold; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  th {
+    background: #f1f5f9;
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted);
+  }
+  td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  td code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #db2777;
+  }
+  tr.req  td:first-child::after { content: " *"; color: #dc2626; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .badge-200 { background: #dcfce7; color: #166534; }
+  .badge-201 { background: #dbeafe; color: #1e40af; }
+  .badge-400 { background: #fef9c3; color: #854d0e; }
+  .badge-401 { background: #fee2e2; color: #991b1b; }
+  .badge-403 { background: #fce7f3; color: #9d174d; }
+  .badge-404 { background: #fee2e2; color: #991b1b; }
+  .badge-409 { background: #ede9fe; color: #5b21b6; }
+
+  /* ── Alerts / callouts ── */
+  .callout {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 12px 0;
+    border-left: 4px solid;
+  }
+  .callout.info  { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+  .callout.warn  { background: #fefce8; border-color: #eab308; color: #713f12; }
+  .callout.tip   { background: #f0fdf4; border-color: #22c55e; color: #14532d; }
+
+  /* ── Env table ── */
+  .env-table td:first-child { font-family: monospace; color: #7c3aed; }
+  .env-table td:last-child  { color: var(--muted); font-size: 12px; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: white; font-size: 12px; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .endpoint { break-inside: avoid; }
+    pre { break-inside: avoid; }
+    h2.section { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     CAPA
+══════════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-tag">Documentação de Uso</div>
+  <h1>DevDungeons API</h1>
+  <p>Guia completo de autenticação e uso de todos os endpoints da plataforma de quiz gamificado.</p>
+  <div class="cover-meta">
+    <span>Versão 1.0</span>
+    <span>Base URL: http://localhost:3000/api</span>
+    <span>Swagger: /api/docs</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SUMÁRIO
+══════════════════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>Sumário</h2>
+  <ol>
+    <li><a href="#visao-geral">Visão Geral</a></li>
+    <li><a href="#autenticacao">Como Autenticar</a></li>
+    <li><a href="#auth">Módulo Auth</a> — register, login, me, refresh</li>
+    <li><a href="#users">Módulo Usuários</a> — CRUD + XP</li>
+    <li><a href="#languages">Módulo Linguagens</a> — CRUD</li>
+    <li><a href="#levels">Módulo Níveis</a> — CRUD</li>
+    <li><a href="#questions">Módulo Questões</a> — CRUD + alternativas + resposta avulsa</li>
+    <li><a href="#quiz">Módulo Quiz</a> — fila de 10 questões, sessão, XP</li>
+    <li><a href="#user-lang-level">Módulo Nível do Usuário por Linguagem</a></li>
+    <li><a href="#erros">Códigos de Erro</a></li>
+    <li><a href="#env">Variáveis de Ambiente</a></li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     VISÃO GERAL
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="visao-geral">1. Visão Geral</h2>
+
+<div class="callout info">
+  <strong>Base URL:</strong> <code>http://localhost:3000/api</code><br>
+  <strong>Swagger interativo:</strong> <code>http://localhost:3000/api/docs</code><br>
+  <strong>Formato:</strong> JSON em todas as requisições e respostas.<br>
+  <strong>Header obrigatório nas rotas protegidas:</strong> <code>Authorization: Bearer &lt;token&gt;</code>
+</div>
+
+<div class="callout tip">
+  <strong>Rotas públicas</strong> (não precisam de token): GET em linguagens, GET em níveis, GET em questões, POST /auth/register, POST /auth/login, POST /auth/refresh.<br>
+  <strong>Todas as demais</strong> exigem o JWT no header <code>Authorization</code>.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     AUTENTICAÇÃO
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="autenticacao">2. Como Autenticar</h2>
+
+<p style="margin-bottom:16px;color:var(--muted)">O fluxo completo em 3 passos:</p>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <div style="background:#6366f1;color:white;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;">PASSO 1</div>
+    <span style="font-weight:600;">Cadastre-se ou faça login</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="sub-title">Request</p>
+    <pre><span class="method-color">POST</span> <span class="url">http://localhost:3000/api/auth/login</span>
+Content-Type: application/json
+
+{
+  <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+  <span class="key">"password"</span>: <span class="str">"123456"</span>
+}</pre>
+    <p class="sub-title">Response</p>
+    <pre>{
+  <span class="key">"accessToken"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="key">"refreshToken"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="key">"expiresIn"</span>: <span class="num">86400</span>,
+  <span class="key">"user"</span>: { <span class="str">"id"</span>: <span class="str">"uuid"</span>, <span class="str">"username"</span>: <span class="str">"João"</span>, ... }
+}</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <div style="background:#6366f1;color:white;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;">PASSO 2</div>
+    <span style="font-weight:600;">Use o accessToken em todas as requisições protegidas</span>
+  </div>
+  <div class="endpoint-body">
+    <pre><span class="method-color">GET</span> <span class="url">http://localhost:3000/api/auth/me</span>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <div style="background:#6366f1;color:white;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;">PASSO 3</div>
+    <span style="font-weight:600;">Renove o token quando expirar</span>
+  </div>
+  <div class="endpoint-body">
+    <pre><span class="method-color">POST</span> <span class="url">http://localhost:3000/api/auth/refresh</span>
+Content-Type: application/json
+
+{ <span class="key">"refreshToken"</span>: <span class="str">"eyJhbGci..."</span> }</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     AUTH
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="auth">3. Módulo Auth</h2>
+
+<!-- register -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/auth/register</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Cadastra um novo usuário. Opcionalmente associa linguagens de interesse com um nível inicial. Retorna tokens prontos para uso — não precisa fazer login separado.</p>
+
+    <p class="sub-title">Body</p>
+    <table>
+      <tr><th>Campo</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+      <tr class="req"><td><code>username</code></td><td>string</td><td>Sim</td><td>Nome de exibição</td></tr>
+      <tr class="req"><td><code>email</code></td><td>string (email)</td><td>Sim</td><td>E-mail único</td></tr>
+      <tr class="req"><td><code>password</code></td><td>string (min 6)</td><td>Sim</td><td>Senha (armazenada com bcrypt)</td></tr>
+      <tr><td><code>languageIds</code></td><td>string[]</td><td>Não</td><td>Array de UUIDs de linguagens de interesse</td></tr>
+      <tr><td><code>levelId</code></td><td>string (uuid)</td><td>Não</td><td>Nível inicial para todas as linguagens selecionadas</td></tr>
+    </table>
+
+    <p class="sub-title">Exemplo de Request</p>
+    <pre>{
+  <span class="key">"username"</span>: <span class="str">"João Silva"</span>,
+  <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+  <span class="key">"password"</span>: <span class="str">"minhasenha"</span>,
+  <span class="key">"languageIds"</span>: [<span class="str">"uuid-javascript"</span>, <span class="str">"uuid-python"</span>],
+  <span class="key">"levelId"</span>: <span class="str">"uuid-basico"</span>
+}</pre>
+
+    <p class="sub-title">Resposta 201</p>
+    <pre>{
+  <span class="key">"accessToken"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="key">"refreshToken"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="key">"expiresIn"</span>: <span class="num">86400</span>,
+  <span class="key">"user"</span>: {
+    <span class="key">"id"</span>: <span class="str">"uuid"</span>,
+    <span class="key">"username"</span>: <span class="str">"João Silva"</span>,
+    <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+    <span class="key">"role"</span>: <span class="str">"USER"</span>,
+    <span class="key">"user_level"</span>: <span class="num">0</span>,
+    <span class="key">"user_experience"</span>: <span class="num">0</span>,
+    <span class="key">"languages"</span>: [
+      {
+        <span class="key">"id"</span>: <span class="str">"uuid"</span>,
+        <span class="key">"language"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+        <span class="key">"level"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> }
+      }
+    ]
+  }
+}</pre>
+
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-400">400</span></td><td>Dados inválidos (email mal formatado, senha curta, campo obrigatório ausente)</td></tr>
+      <tr><td><span class="badge badge-409">409</span></td><td>E-mail já cadastrado</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- login -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/auth/login</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Autentica com e-mail e senha. Retorna accessToken (padrão: 24h) e refreshToken (padrão: 7 dias).</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{
+  <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+  <span class="key">"password"</span>: <span class="str">"minhasenha"</span>
+}</pre>
+
+    <p class="sub-title">Resposta 200</p>
+    <pre>{
+  <span class="key">"accessToken"</span>: <span class="str">"eyJhbGci..."</span>,
+  <span class="key">"refreshToken"</span>: <span class="str">"eyJhbGci..."</span>,
+  <span class="key">"expiresIn"</span>: <span class="num">86400</span>,
+  <span class="key">"user"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"username"</span>: <span class="str">"João Silva"</span>, <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+             <span class="key">"role"</span>: <span class="str">"USER"</span>, <span class="key">"user_level"</span>: <span class="num">2</span>, <span class="key">"user_experience"</span>: <span class="num">350</span>, <span class="key">"languages"</span>: [...] }
+}</pre>
+
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-401">401</span></td><td>E-mail não encontrado ou senha incorreta</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- me -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/auth/me</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Retorna o perfil completo do usuário autenticado: dados pessoais, nível global, XP e todas as linguagens associadas com seus respectivos níveis.</p>
+
+    <p class="sub-title">Request</p>
+    <pre><span class="method-color">GET</span> /api/auth/me
+Authorization: Bearer &lt;accessToken&gt;</pre>
+
+    <p class="sub-title">Resposta 200</p>
+    <pre>{
+  <span class="key">"id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"username"</span>: <span class="str">"João Silva"</span>,
+  <span class="key">"email"</span>: <span class="str">"joao@email.com"</span>,
+  <span class="key">"role"</span>: <span class="str">"USER"</span>,
+  <span class="key">"user_level"</span>: <span class="num">2</span>,
+  <span class="key">"user_experience"</span>: <span class="num">350</span>,
+  <span class="key">"languages"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="str">"uuid-assoc"</span>,
+      <span class="key">"language"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+      <span class="key">"level"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> }
+    }
+  ]
+}</pre>
+  </div>
+</div>
+
+<!-- refresh -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/auth/refresh</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Gera um novo par de tokens sem exigir login novamente. Use quando o accessToken expirar.</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"refreshToken"</span>: <span class="str">"eyJhbGci..."</span> }</pre>
+
+    <p class="sub-title">Resposta 200</p>
+    <pre>{ <span class="key">"accessToken"</span>: <span class="str">"..."</span>, <span class="key">"refreshToken"</span>: <span class="str">"..."</span>, <span class="key">"expiresIn"</span>: <span class="num">86400</span> }</pre>
+
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-401">401</span></td><td>Refresh token inválido ou expirado</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     USUÁRIOS
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="users">4. Módulo Usuários</h2>
+
+<div class="callout warn">Todos os endpoints de usuário (exceto <code>POST /api/user</code>) requerem autenticação via JWT.</div>
+
+<!-- POST user -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/user</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Cria um usuário diretamente (sem retornar token). Para o fluxo completo de cadastro com token, prefira <code>POST /api/auth/register</code>.</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"username"</span>: <span class="str">"Ana"</span>, <span class="key">"email"</span>: <span class="str">"ana@email.com"</span>, <span class="key">"password"</span>: <span class="str">"123456"</span> }</pre>
+    <p class="sub-title">Resposta 201</p>
+    <pre>{ <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"username"</span>: <span class="str">"Ana"</span>, <span class="key">"email"</span>: <span class="str">"ana@email.com"</span>,
+  <span class="key">"role"</span>: <span class="str">"USER"</span>, <span class="key">"user_level"</span>: <span class="num">0</span>, <span class="key">"user_experience"</span>: <span class="num">0</span> }</pre>
+  </div>
+</div>
+
+<!-- GET user/:id -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/user/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Busca um usuário pelo UUID. Senha nunca é retornada.</p>
+    <p class="sub-title">Parâmetros de rota</p>
+    <table>
+      <tr><th>Parâmetro</th><th>Tipo</th><th>Descrição</th></tr>
+      <tr><td><code>id</code></td><td>uuid</td><td>ID do usuário</td></tr>
+    </table>
+    <p class="sub-title">Resposta 200</p>
+    <pre>{ <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"username"</span>: <span class="str">"Ana"</span>, <span class="key">"email"</span>: <span class="str">"ana@email.com"</span>,
+  <span class="key">"role"</span>: <span class="str">"USER"</span>, <span class="key">"user_level"</span>: <span class="num">1</span>, <span class="key">"user_experience"</span>: <span class="num">200</span> }</pre>
+  </div>
+</div>
+
+<!-- PATCH user/:id -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/user/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Atualiza username, email ou senha. Todos os campos são opcionais. A senha nova é automaticamente hasheada com bcrypt.</p>
+    <p class="sub-title">Body (todos opcionais)</p>
+    <pre>{ <span class="key">"username"</span>: <span class="str">"Novo Nome"</span>, <span class="key">"email"</span>: <span class="str">"novo@email.com"</span>, <span class="key">"password"</span>: <span class="str">"novasenha"</span> }</pre>
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-404">404</span></td><td>Usuário não encontrado</td></tr>
+      <tr><td><span class="badge badge-409">409</span></td><td>Novo e-mail já pertence a outro usuário</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH update-experience -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/user/update-experience</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Adiciona XP a um usuário manualmente. Se o total atingir 1000 XP, o nível global sobe automaticamente e o excedente é carregado para o próximo nível.</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"id"</span>: <span class="str">"uuid-do-usuario"</span>, <span class="key">"user_experience"</span>: <span class="num">50</span> }</pre>
+    <p class="sub-title">Resposta 200</p>
+    <pre>{ <span class="key">"message"</span>: <span class="str">"XP atualizado para 400"</span> }
+<span class="null">// ou, ao subir de nível:</span>
+{ <span class="key">"message"</span>: <span class="str">"Parabéns! Você subiu para o nível 3"</span> }</pre>
+    <div class="callout info">O quiz credita XP automaticamente. Este endpoint é para casos manuais ou administrativos.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     LINGUAGENS
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="languages">5. Módulo Linguagens</h2>
+
+<div class="callout tip">GET sem token. POST, PATCH e DELETE exigem JWT.</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/programming-languages</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Lista todas as linguagens em ordem alfabética. Seeded automaticamente: HTML, CSS, Python, JavaScript.</p>
+    <p class="sub-title">Resposta 200</p>
+    <pre>[
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"CSS"</span>, <span class="key">"created_at"</span>: <span class="str">"2024-01-01T..."</span>, <span class="key">"updated_at"</span>: <span class="str">"..."</span> },
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"HTML"</span>, ... },
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span>, ... },
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Python"</span>, ... }
+]</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/programming-languages/:id</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Busca uma linguagem pelo UUID.</p>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/programming-languages</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Cria uma linguagem de programação. O nome deve ser único (máx. 100 chars).</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"name"</span>: <span class="str">"TypeScript"</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/programming-languages/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"name"</span>: <span class="str">"TypeScript 5"</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="endpoint-url">/api/programming-languages/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Remove a linguagem. <strong>Cascade:</strong> todas as questões associadas são removidas junto.</p>
+    <p class="sub-title">Resposta 200</p>
+    <pre>{ <span class="key">"message"</span>: <span class="str">"Linguagem uuid removida com sucesso"</span> }</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NÍVEIS
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="levels">6. Módulo Níveis de Conhecimento</h2>
+
+<div class="callout tip">Os níveis Básico (50 XP), Intermediário (75 XP) e Avançado (100 XP) são criados automaticamente na inicialização. O campo <code>xp</code> define quantos pontos o usuário ganha ao acertar uma questão daquele nível.</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/knowledge-levels</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="sub-title">Resposta 200</p>
+    <pre>[
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Avançado"</span>,      <span class="key">"xp"</span>: <span class="num">100</span>, ... },
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>,        <span class="key">"xp"</span>: <span class="num">50</span>,  ... },
+  { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Intermediário"</span>, <span class="key">"xp"</span>: <span class="num">75</span>,  ... }
+]</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/knowledge-levels</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"name"</span>: <span class="str">"Expert"</span>, <span class="key">"xp"</span>: <span class="num">150</span> }  <span class="null">// xp é opcional, default 0</span></pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/knowledge-levels/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="sub-title">Body (ambos opcionais)</p>
+    <pre>{ <span class="key">"name"</span>: <span class="str">"Iniciante"</span>, <span class="key">"xp"</span>: <span class="num">30</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="endpoint-url">/api/knowledge-levels/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Remove o nível. Questões associadas ficam com <code>level_id = null</code>. Associações usuário-linguagem-nível são removidas em cascade.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     QUESTÕES
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="questions">7. Módulo Questões</h2>
+
+<div class="callout tip">Leitura (GET) é pública. Criação, edição, remoção e resposta avulsa exigem JWT.</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/questions</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Lista todas as questões com linguagem, nível e alternativas incluídos. Ordenado por <code>created_at DESC</code>.</p>
+    <p class="sub-title">Resposta 200 (estrutura de uma questão)</p>
+    <pre>{
+  <span class="key">"id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"enunciado"</span>: <span class="str">"Qual método exibe mensagem no console?"</span>,
+  <span class="key">"language"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+  <span class="key">"level"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> },
+  <span class="key">"alternatives"</span>: [
+    { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"console.log()"</span>, <span class="key">"correta"</span>: <span class="bool">true</span>  },
+    { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"print()"</span>,        <span class="key">"correta"</span>: <span class="bool">false</span> },
+    ...
+  ]
+}</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/questions/by-language/:languageId</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Filtra questões por linguagem. Retorna array com a mesma estrutura do GET geral.</p>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/questions/by-level/:levelId</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Filtra questões por nível de conhecimento.</p>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/questions</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Cria uma questão com exatamente 5 alternativas, sendo obrigatoriamente 1 correta. Linguagem é obrigatória; nível é opcional.</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{
+  <span class="key">"enunciado"</span>: <span class="str">"Qual tag cria um link em HTML?"</span>,
+  <span class="key">"language_id"</span>: <span class="str">"uuid-html"</span>,
+  <span class="key">"level_id"</span>: <span class="str">"uuid-basico"</span>,
+  <span class="key">"alternatives"</span>: [
+    { <span class="key">"descricao"</span>: <span class="str">"&lt;a&gt;"</span>,         <span class="key">"correta"</span>: <span class="bool">true</span>  },
+    { <span class="key">"descricao"</span>: <span class="str">"&lt;link&gt;"</span>,      <span class="key">"correta"</span>: <span class="bool">false</span> },
+    { <span class="key">"descricao"</span>: <span class="str">"&lt;href&gt;"</span>,      <span class="key">"correta"</span>: <span class="bool">false</span> },
+    { <span class="key">"descricao"</span>: <span class="str">"&lt;url&gt;"</span>,       <span class="key">"correta"</span>: <span class="bool">false</span> },
+    { <span class="key">"descricao"</span>: <span class="str">"&lt;hyperlink&gt;"</span>, <span class="key">"correta"</span>: <span class="bool">false</span> }
+  ]
+}</pre>
+
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-400">400</span></td><td>Número de alternativas diferente de 5 ou número de corretas diferente de 1</td></tr>
+      <tr><td><span class="badge badge-404">404</span></td><td>language_id ou level_id não encontrado</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/questions/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Atualiza enunciado, linguagem ou nível. Para editar alternativas use os endpoints de alternativas.</p>
+    <p class="sub-title">Body (todos opcionais)</p>
+    <pre>{ <span class="key">"enunciado"</span>: <span class="str">"Novo enunciado"</span>, <span class="key">"language_id"</span>: <span class="str">"uuid"</span>, <span class="key">"level_id"</span>: <span class="str">"uuid"</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="endpoint-url">/api/questions/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Remove a questão e todas as suas alternativas em cascade.</p>
+  </div>
+</div>
+
+<!-- answer avulso -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/questions/:id/answer</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Resposta avulsa — fora de uma sessão de quiz. Verifica se a alternativa está correta e credita XP ao usuário autenticado. Não guarda histórico de respostas.</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"alternative_id"</span>: <span class="str">"uuid-da-alternativa-escolhida"</span> }</pre>
+
+    <p class="sub-title">Resposta 200</p>
+    <pre>{
+  <span class="key">"question_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"chosen_alternative_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"correct"</span>: <span class="bool">true</span>,
+  <span class="key">"correct_alternative_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"question_xp"</span>: <span class="num">50</span>,
+  <span class="key">"xp_earned"</span>: <span class="num">50</span>,
+  <span class="key">"user_update"</span>: { <span class="key">"message"</span>: <span class="str">"XP atualizado para 400"</span> }
+}</pre>
+    <div class="callout warn">Para um fluxo completo com histórico, fila de 10 questões e XP ao final, use o módulo <strong>Quiz</strong>.</div>
+  </div>
+</div>
+
+<!-- alternativas -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/questions/:id/alternatives</span>
+    <span class="badge tag-public">Público</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Lista as alternativas de uma questão em ordem de criação (ASC).</p>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/questions/:id/alternatives</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Adiciona alternativa a uma questão que ainda não atingiu 5 alternativas.</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"descricao"</span>: <span class="str">"Nova alternativa"</span>, <span class="key">"correta"</span>: <span class="bool">false</span> }</pre>
+    <table>
+      <tr><th>Status</th><th>Motivo de erro</th></tr>
+      <tr><td><span class="badge badge-400">400</span></td><td>Questão já tem 5 alternativas ou já possui 1 correta e <code>correta: true</code> foi enviado</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/questions/alternatives/:alternativeId</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Atualiza texto ou status de correta. Ao enviar <code>correta: true</code>, as demais alternativas da mesma questão são automaticamente desmarcadas.</p>
+    <p class="sub-title">Body (ambos opcionais)</p>
+    <pre>{ <span class="key">"descricao"</span>: <span class="str">"Texto corrigido"</span>, <span class="key">"correta"</span>: <span class="bool">true</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="endpoint-url">/api/questions/alternatives/:alternativeId</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Remove uma alternativa. Só é permitido se a questão tiver mais de 5 alternativas (adicione a substituta antes de remover).</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     QUIZ
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="quiz">8. Módulo Quiz — Fila de 10 Questões</h2>
+
+<div class="callout info">
+  <strong>Todos os endpoints do Quiz exigem autenticação JWT.</strong><br>
+  O quiz seleciona aleatoriamente até 10 questões para a linguagem/nível escolhido, rastreia cada resposta e credita o XP total ao usuário ao finalizar. As respostas corretas não são reveladas antes de cada questão ser respondida.
+</div>
+
+<!-- start -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/quiz/start</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Inicia uma nova sessão de quiz. Se já existir uma sessão <code>IN_PROGRESS</code> para a mesma linguagem/nível, ela é retomada automaticamente — não cria duplicatas.</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{
+  <span class="key">"language_id"</span>: <span class="str">"uuid-javascript"</span>,
+  <span class="key">"level_id"</span>:    <span class="str">"uuid-basico"</span>   <span class="null">// opcional</span>
+}</pre>
+
+    <p class="sub-title">Resposta 201 (sessão iniciada)</p>
+    <pre>{
+  <span class="key">"session_id"</span>: <span class="str">"uuid-sessao"</span>,
+  <span class="key">"status"</span>: <span class="str">"IN_PROGRESS"</span>,
+  <span class="key">"language"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+  <span class="key">"level"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> },
+  <span class="key">"progress"</span>: {
+    <span class="key">"questions_answered"</span>: <span class="num">0</span>,
+    <span class="key">"questions_total"</span>: <span class="num">10</span>,
+    <span class="key">"current_score"</span>: <span class="num">0</span>,
+    <span class="key">"total_xp_earned"</span>: <span class="num">0</span>,
+    <span class="key">"accuracy_percentage"</span>: <span class="num">0</span>,
+    <span class="key">"current_question_order"</span>: <span class="num">1</span>,
+    <span class="key">"is_complete"</span>: <span class="bool">false</span>,
+    <span class="key">"completed_at"</span>: <span class="null">null</span>
+  },
+  <span class="key">"questions"</span>: [
+    {
+      <span class="key">"order"</span>: <span class="num">1</span>,
+      <span class="key">"question_id"</span>: <span class="str">"uuid"</span>,
+      <span class="key">"enunciado"</span>: <span class="str">"Qual palavra-chave declara variável com escopo de bloco?"</span>,
+      <span class="key">"alternatives"</span>: [
+        { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"var"</span>     },
+        { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"let"</span>     },
+        { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"const"</span>   },
+        { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"def"</span>     },
+        { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"descricao"</span>: <span class="str">"declare"</span> }
+      ],
+      <span class="key">"answered"</span>: <span class="bool">false</span>, <span class="key">"your_answer"</span>: <span class="null">null</span>, <span class="key">"correct"</span>: <span class="null">null</span>,
+      <span class="key">"correct_alternative_id"</span>: <span class="null">null</span>, <span class="key">"xp_earned"</span>: <span class="num">0</span>
+    },
+    <span class="null">// ... questões 2 a 10 (sem correta revelada)</span>
+  ]
+}</pre>
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-400">400</span></td><td>Questões insuficientes (mínimo 3 disponíveis para a linguagem/nível)</td></tr>
+      <tr><td><span class="badge badge-404">404</span></td><td>Linguagem ou nível não encontrado</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- answer -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/quiz/:sessionId/answer</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Registra a resposta para uma questão da sessão. Ao responder a última questão, a sessão é finalizada e o XP total é creditado ao usuário automaticamente.</p>
+
+    <p class="sub-title">Body</p>
+    <pre>{
+  <span class="key">"question_id"</span>:    <span class="str">"uuid-da-questao"</span>,
+  <span class="key">"alternative_id"</span>: <span class="str">"uuid-da-alternativa-escolhida"</span>
+}</pre>
+
+    <p class="sub-title">Resposta 200 — questão intermediária</p>
+    <pre>{
+  <span class="key">"question_order"</span>: <span class="num">3</span>,
+  <span class="key">"correct"</span>: <span class="bool">true</span>,
+  <span class="key">"correct_alternative_id"</span>: <span class="str">"uuid-correta"</span>,
+  <span class="key">"xp_earned"</span>: <span class="num">50</span>,
+  <span class="key">"session"</span>: {
+    <span class="key">"id"</span>: <span class="str">"uuid-sessao"</span>,
+    <span class="key">"questions_answered"</span>: <span class="num">3</span>,
+    <span class="key">"questions_total"</span>: <span class="num">10</span>,
+    <span class="key">"current_score"</span>: <span class="num">2</span>,
+    <span class="key">"total_xp_earned"</span>: <span class="num">100</span>,
+    <span class="key">"is_complete"</span>: <span class="bool">false</span>,
+    <span class="key">"next_question_order"</span>: <span class="num">4</span>,
+    <span class="key">"completed_at"</span>: <span class="null">null</span>
+  },
+  <span class="key">"final_results"</span>: <span class="null">null</span>
+}</pre>
+
+    <p class="sub-title">Resposta 200 — última questão (sessão completa)</p>
+    <pre>{
+  <span class="key">"question_order"</span>: <span class="num">10</span>,
+  <span class="key">"correct"</span>: <span class="bool">false</span>,
+  <span class="key">"correct_alternative_id"</span>: <span class="str">"uuid-correta"</span>,
+  <span class="key">"xp_earned"</span>: <span class="num">0</span>,
+  <span class="key">"session"</span>: {
+    <span class="key">"questions_answered"</span>: <span class="num">10</span>, <span class="key">"questions_total"</span>: <span class="num">10</span>,
+    <span class="key">"current_score"</span>: <span class="num">7</span>, <span class="key">"total_xp_earned"</span>: <span class="num">350</span>,
+    <span class="key">"is_complete"</span>: <span class="bool">true</span>, <span class="key">"next_question_order"</span>: <span class="null">null</span>,
+    <span class="key">"completed_at"</span>: <span class="str">"2024-01-15T14:32:00.000Z"</span>
+  },
+  <span class="key">"final_results"</span>: {
+    <span class="key">"correct_answers"</span>: <span class="num">7</span>,
+    <span class="key">"wrong_answers"</span>: <span class="num">3</span>,
+    <span class="key">"accuracy_percentage"</span>: <span class="num">70</span>,
+    <span class="key">"total_xp_earned"</span>: <span class="num">350</span>,
+    <span class="key">"questions_summary"</span>: [
+      { <span class="key">"order"</span>: <span class="num">1</span>, <span class="key">"enunciado"</span>: <span class="str">"..."</span>, <span class="key">"your_answer_id"</span>: <span class="str">"uuid"</span>,
+        <span class="key">"correct_answer_id"</span>: <span class="str">"uuid"</span>, <span class="key">"correct"</span>: <span class="bool">true</span>, <span class="key">"xp_earned"</span>: <span class="num">50</span> },
+      <span class="null">// ... questões 2 a 10</span>
+    ]
+  }
+}</pre>
+
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-400">400</span></td><td>Questão já respondida / alternativa inválida / sessão já finalizada</td></tr>
+      <tr><td><span class="badge badge-403">403</span></td><td>A sessão pertence a outro usuário</td></tr>
+      <tr><td><span class="badge badge-404">404</span></td><td>Sessão não encontrada</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- history -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/quiz/history</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Histórico de todas as sessões do usuário autenticado, da mais recente para a mais antiga.</p>
+    <p class="sub-title">Resposta 200</p>
+    <pre>[
+  {
+    <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"status"</span>: <span class="str">"COMPLETED"</span>,
+    <span class="key">"language"</span>: { <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+    <span class="key">"level"</span>: { <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> },
+    <span class="key">"score"</span>: <span class="num">7</span>, <span class="key">"total_questions"</span>: <span class="num">10</span>,
+    <span class="key">"accuracy_percentage"</span>: <span class="num">70</span>, <span class="key">"total_xp_earned"</span>: <span class="num">350</span>,
+    <span class="key">"started_at"</span>: <span class="str">"2024-01-15T14:20:00.000Z"</span>,
+    <span class="key">"completed_at"</span>: <span class="str">"2024-01-15T14:32:00.000Z"</span>
+  }
+]</pre>
+  </div>
+</div>
+
+<!-- get session -->
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/quiz/:sessionId</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Estado completo de uma sessão. Questões já respondidas mostram <code>correta</code> nas alternativas; questões não respondidas ocultam esse campo.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     USER LANGUAGE LEVEL
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="user-lang-level">9. Módulo Nível do Usuário por Linguagem</h2>
+
+<div class="callout info">Registra em qual nível um usuário está para cada linguagem que estuda. Um usuário só pode ter <strong>um nível por linguagem</strong>. Todos os endpoints exigem JWT.</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method GET">GET</span>
+    <span class="endpoint-url">/api/user-language-levels/by-user/:userId</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Retorna todas as linguagens e níveis de um usuário. Ideal para renderizar o dashboard de progresso.</p>
+    <p class="sub-title">Resposta 200</p>
+    <pre>[
+  {
+    <span class="key">"id"</span>: <span class="str">"uuid-assoc"</span>,
+    <span class="key">"user_id"</span>: <span class="str">"uuid-user"</span>,
+    <span class="key">"language"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"JavaScript"</span> },
+    <span class="key">"level"</span>: { <span class="key">"id"</span>: <span class="str">"uuid"</span>, <span class="key">"name"</span>: <span class="str">"Básico"</span>, <span class="key">"xp"</span>: <span class="num">50</span> },
+    <span class="key">"created_at"</span>: <span class="str">"..."</span>, <span class="key">"updated_at"</span>: <span class="str">"..."</span>
+  }
+]</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method POST">POST</span>
+    <span class="endpoint-url">/api/user-language-levels</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Associa um usuário a uma linguagem com nível inicial. Também feito automaticamente pelo <code>POST /auth/register</code> se <code>languageIds</code> e <code>levelId</code> forem enviados.</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"user_id"</span>: <span class="str">"uuid"</span>, <span class="key">"language_id"</span>: <span class="str">"uuid"</span>, <span class="key">"level_id"</span>: <span class="str">"uuid"</span> }</pre>
+    <p class="sub-title">Respostas de Erro</p>
+    <table>
+      <tr><th>Status</th><th>Motivo</th></tr>
+      <tr><td><span class="badge badge-409">409</span></td><td>Usuário já possui nível cadastrado para esta linguagem</td></tr>
+      <tr><td><span class="badge badge-404">404</span></td><td>user_id, language_id ou level_id não encontrado</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="endpoint-url">/api/user-language-levels/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Avança o nível do usuário em uma linguagem (ex: Básico → Intermediário).</p>
+    <p class="sub-title">Body</p>
+    <pre>{ <span class="key">"level_id"</span>: <span class="str">"uuid-intermediario"</span> }</pre>
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="endpoint-url">/api/user-language-levels/:id</span>
+    <span class="badge tag-protected">Protegido</span>
+  </div>
+  <div class="endpoint-body">
+    <p class="endpoint-desc">Remove a associação. O usuário deixa de ter aquela linguagem em seu perfil.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ERROS
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="erros">10. Códigos de Erro</h2>
+
+<table>
+  <tr><th>Status</th><th>Significado</th><th>Causas comuns</th></tr>
+  <tr>
+    <td><span class="badge badge-400">400 Bad Request</span></td>
+    <td>Dados inválidos</td>
+    <td>Campo obrigatório ausente, tipo errado, número de alternativas ≠ 5, questão já respondida</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-401">401 Unauthorized</span></td>
+    <td>Não autenticado</td>
+    <td>Token ausente, expirado ou mal formado. Fazer login novamente</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-403">403 Forbidden</span></td>
+    <td>Acesso negado</td>
+    <td>Sessão de quiz pertence a outro usuário</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-404">404 Not Found</span></td>
+    <td>Recurso não encontrado</td>
+    <td>ID inválido ou registro deletado</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-409">409 Conflict</span></td>
+    <td>Conflito de dados únicos</td>
+    <td>E-mail duplicado, nome de linguagem/nível duplicado, usuário já tem nível para a linguagem</td>
+  </tr>
+</table>
+
+<p style="margin-top:16px;color:var(--muted);font-size:13px;">Todos os erros seguem o formato padrão do NestJS:</p>
+<pre>{
+  <span class="key">"statusCode"</span>: <span class="num">400</span>,
+  <span class="key">"message"</span>: <span class="str">"Cada questão deve possuir exatamente 5 alternativas"</span>,
+  <span class="key">"error"</span>: <span class="str">"Bad Request"</span>
+}</pre>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ENV
+══════════════════════════════════════════════════════════════════ -->
+<h2 class="section" id="env">11. Variáveis de Ambiente (.env)</h2>
+
+<table class="env-table">
+  <tr><th>Variável</th><th>Exemplo</th><th>Descrição</th></tr>
+  <tr><td>DB_HOST</td><td>localhost</td><td>Host do PostgreSQL</td></tr>
+  <tr><td>DB_PORT</td><td>5432</td><td>Porta do PostgreSQL</td></tr>
+  <tr><td>DB_USERNAME</td><td>postgres</td><td>Usuário do banco</td></tr>
+  <tr><td>DB_PASSWORD</td><td>senha</td><td>Senha do banco</td></tr>
+  <tr><td>DB_NAME</td><td>devdungeons</td><td>Nome do banco de dados</td></tr>
+  <tr><td>JWT_SECRET</td><td>chave_secreta_aqui</td><td>Segredo para assinar o access token (min 32 chars)</td></tr>
+  <tr><td>JWT_EXPIRES_IN</td><td>86400</td><td>Expiração do access token em segundos (86400 = 24h)</td></tr>
+  <tr><td>JWT_REFRESH_SECRET</td><td>outra_chave_secreta</td><td>Segredo para assinar o refresh token</td></tr>
+  <tr><td>JWT_REFRESH_EXPIRES_IN</td><td>7d</td><td>Expiração do refresh token</td></tr>
+  <tr><td>PORT</td><td>3000</td><td>Porta do servidor (opcional, default 3000)</td></tr>
+  <tr><td>CORS_ORIGIN</td><td>http://localhost:5173</td><td>Origins permitidos (separados por vírgula)</td></tr>
+</table>
+
+<div style="margin-top:48px;padding:24px;background:#f1f5f9;border-radius:10px;text-align:center;color:var(--muted);font-size:12px;">
+  DevDungeons API · Documentação gerada em 08/06/2026 · Swagger interativo disponível em <code>/api/docs</code>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

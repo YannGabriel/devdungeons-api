@@ -15,6 +15,7 @@ import { QuestionModule } from "./modules/question/question.module";
 import { UserLanguageLevelModule } from "./modules/user-language-level/user-language-level.module";
 import { QuizModule } from "./modules/quiz/quiz.module";
 import { SeederModule } from "./database/seed/seeder.module";
+import { RankingsModule } from "./modules/rankings/rankings.module";
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { SeederModule } from "./database/seed/seeder.module";
         QuestionModule,
         UserLanguageLevelModule,
         QuizModule,
+        RankingsModule,
         SeederModule,
     ],
     controllers: [AppController],
